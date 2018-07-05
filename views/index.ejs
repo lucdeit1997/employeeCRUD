@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <br>
+    <br>
+    <div style="text-align: center">
+        <h4><strong>DANH SÁCH NHÂN VIÊN</strong></h4>
+    </div>
+    <br>
+    <a class="btn btn-primary btn_insert"  data-toggle="modal" data-target="#myInsertModal">Thêm</a>    
+    <br>
+    <br>
+    <table class="table table-hover table-condensed table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th>Age</th>
+          <th>Address</th>
+          <th>CRUD</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% data.forEach(item =>{%>
+            <tr>
+                <td><%= item.fullName%></td>
+                <td><%= item.age%></td>
+                <td><%= item.address%></td>
+                <td>
+                    <a class="btn btn-danger btn_delete" _id="<%= item._id%>">xóa</a>
+                    <a class="btn btn-warning btn_edit" data-toggle="modal" data-target="#myModal" _id="<%= item._id%>" >Sửa</a>
+                </td>
+            </tr>  
+        <%})%>
+      </tbody>
+    </table>
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <div style="text-align: center">
+                    <strong>
+                        <h4 class="modal-title">NHẬP THÔNG TIN CẦN SỬA</h4>
+                    </strong>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <form>
+                        <div class="form-group">
+                        <div id="layId" style="display: none;">Lấy ID </div>
+                        <label for="fullName">Full Name:</label>
+                        <input type="fullName" class="form-control" id="fullName" placeholder="Enter Full Name" name="fullName">
+                        </div>
+                        <div class="form-group">
+                        <label for="Age">Age:</label>
+                        <input type="text" class="form-control" id="Age" placeholder="Enter Age" name="age">
+                        </div>
+                        <div class="form-group">
+                            <label for="Address">Address:</label>
+                            <input type="text" class="form-control" id="Address" placeholder="Enter Address" name="address">
+                            </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="Save">Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            </div>
+        </div>
+        </div>
+  </div>
+  <!-- form insert -->
+  <div class="modal fade" id="myInsertModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <div style="text-align: center">
+                    <strong>
+                        <h4 class="modal-title">NHẬP THÔNG TIN CẦN THÊM</h4>
+                    </strong>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <form>
+                        <div class="form-group">
+                        <div id="layId" style="display: none;">Lấy ID </div>
+                        <label for="fullName">Full Name:</label>
+                        <input type="fullName" class="form-control" id="fullNameInsert" placeholder="Enter Full Name" name="fullName">
+                        </div>
+                        <div class="form-group">
+                        <label for="Age">Age:</label>
+                        <input type="text" class="form-control" id="AgeInsert" placeholder="Enter Age" name="age">
+                        </div>
+                        <div class="form-group">
+                            <label for="Address">Address:</label>
+                            <input type="text" class="form-control" id="AddressInsert" placeholder="Enter Address" name="address">
+                            </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="insert">Insert</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+            </div>
+        </div>
+        </div>
+  </div>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <script>
+      $(document).ready(function(){
+          //nút xóa
+          $('.btn_delete').on('click', function(){
+            swal({
+                title: "Bạn Có Chăc Muốn Xóa Không",
+                text: "hello",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+                })
+                .then((willDelete) => {
+                if (willDelete) {
+                    const _id = $(this).attr('_id');
+                    $.get(`/xoa-nhan-vien/${_id}`,function(){
+                        swal("Xóa thành công rồi nhé!", {
+                        icon: "success",
+                        },);
+                        location.reload();
+                    })
+                } else {
+                    swal("Haha Vui Quá Nó Không Xóa!");
+                }
+            });
+          })
+          //nút sửa
+          $('.btn_edit').on('click', function(){
+              const _id = $(this).attr('_id');
+              const uri = `/sua-nhan-vien/${_id}`;
+              $.get(uri, function(data, stausCode){
+                  $('#fullName').val(data.fullName);
+                  $('#Age').val(data.age);
+                  $('#Address').val(data.address); 
+                  $('#layId').val(data._id);                
+              })
+          });
+          //nhấn enter
+            $(document).keypress(function(e) {
+                if(e.which == 13){
+                    $('#Save').click();
+                }
+            });
+        // nút lưu
+          $('#Save').on('click', function() {
+            const _id = $('#layId').val();
+            const fullName =  $('#fullName').val();
+            const  age = $('#Age').val();
+            const address = $('#Address').val();
+
+            const data = {
+                fullName: fullName,
+                age:  age,
+                address: address
+            }
+            const uri = `/sua-nhan-vien/${_id}`;
+            $.post(uri, data, function(data){
+                location.reload();
+            })
+          })
+          
+          //sử lý nút thêm
+          $('#insert').on('click', function() {
+           
+            const fullName =  $('#fullNameInsert').val();
+            const  age = $('#AgeInsert').val();
+            const address = $('#AddressInsert').val();
+
+            const data = {
+                fullName: fullName,
+                age:  age,
+                address: address
+            }
+            const uri = `/them-nhan-vien`;
+            $.post(uri, data, function(data){
+                location.reload();
+            })
+          })
+      })
+  </script>
+</body>
+</html>
